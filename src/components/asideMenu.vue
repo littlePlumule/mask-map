@@ -2,83 +2,43 @@
   <div class="aside-menu">
     <div class="wraps">
       <label>
-        縣市：<select><option>台北市</option></select>
+        縣市：<select v-model="currCity">
+          <option v-for="city in cityList" :key="city">{{ city }}</option>
+        </select>
       </label>
       <label>
-        行政區：<select><option>北投區</option></select>
+        行政區：<select v-model="currDistrict">
+          <option v-for="district in districtList" :key="district.id">{{ district.name }}</option>
+        </select>
       </label>
     </div>
 
     <div class="wraps">
       <label>
         <i class="fas fa-search-location"></i> 關鍵字搜尋：
-        <input type="text" placeholder="請輸入關鍵字">
+        <input type="text" placeholder="請輸入關鍵字" v-model="keywords">
       </label>
     </div>
 
     <ul class="store-lists">
-      <li class="store-info wraps">
-        <h1>ＸＸ藥局</h1>
+      <li class="store-info wraps" v-for="store in filteredStores" :key="store.id">
+        <h1 v-html="keywordHighlight(store.name)"></h1>
 
         <div class="mask-info">
           <i class="fas fa-head-side-mask"></i>
-          <span>大人口罩: 100 個</span>
+          <span>大人口罩: {{ store.mask_adult }} 個</span>
         </div>
 
         <div class="mask-info">
           <i class="fas fa-baby"></i>
-          <span>兒童口罩: 100 個</span>
+          <span>兒童口罩: {{ store.mask_child }} 個</span>
         </div>
 
         <div class="mask-info">
-          最後更新時間:
+          最後更新時間: {{ store.updated }}
         </div>
 
-        <button class="btn-store-detail">
-          <i class="fas fa-info-circle"></i>
-          看詳細資訊
-        </button>
-      </li>
-      <li class="store-info wraps">
-        <h1>ＸＸ藥局</h1>
-
-        <div class="mask-info">
-          <i class="fas fa-head-side-mask"></i>
-          <span>大人口罩: 100 個</span>
-        </div>
-
-        <div class="mask-info">
-          <i class="fas fa-baby"></i>
-          <span>兒童口罩: 100 個</span>
-        </div>
-
-        <div class="mask-info">
-          最後更新時間:
-        </div>
-
-        <button class="btn-store-detail">
-          <i class="fas fa-info-circle"></i>
-          看詳細資訊
-        </button>
-      </li>
-      <li class="store-info wraps">
-        <h1>ＸＸ藥局</h1>
-
-        <div class="mask-info">
-          <i class="fas fa-head-side-mask"></i>
-          <span>大人口罩: 100 個</span>
-        </div>
-
-        <div class="mask-info">
-          <i class="fas fa-baby"></i>
-          <span>兒童口罩: 100 個</span>
-        </div>
-
-        <div class="mask-info">
-          最後更新時間:
-        </div>
-
-        <button class="btn-store-detail">
+        <button class="btn-store-detail" @click="openInfoBox(store.id)">
           <i class="fas fa-info-circle"></i>
           看詳細資訊
         </button>
@@ -88,10 +48,70 @@
   </div>
 </template>
 <script>
-export default {
-  
+import { mapGetters } from 'vuex';
+export default {  
+  computed: {
+    currCity: {
+      get() {
+        return this.$store.state.currCity;
+      },
+      set(value) {
+        this.$store.commit('setcurrCity', value);
+      }
+    },
+    currDistrict: {
+      get() {
+        return this.$store.state.currDistrict;
+      },
+      set(value) {
+        this.$store.commit('setcurrDistrict', value);
+      }
+    },
+    keywords: {
+      get() {
+        return this.$store.state.keywords;
+      },
+      set(value) {
+        this.$store.commit('setKeywords', value);
+      }
+    },
+    showModal: {
+      get() {
+        return this.$store.state.showModal;
+      },
+      set(value) {
+        this.$store.commit('setshowModal', value);
+      }
+    },
+    infoBoxSid: {
+      get() {
+        return this.$store.state.infoBoxSid;
+      },
+      set(value) {
+        this.$store.commit('setInfoBoxSid', value);
+      }
+    },
+    ...mapGetters(['cityList', 'districtList', 'filteredStores'])
+  },
+  methods: {
+    keywordHighlight(value) {
+      return value.replace(new RegExp(this.keywords, 'g'), `<span class="highlight">${this.keywords}</span>`)
+    },
+    openInfoBox(sid) {
+      this.showModal = true;
+      this.infoBoxSid = sid;
+    }
+  },
+  watch: {
+    districtList(v) {
+      const [arr] = v;
+      this.currDistrict = arr.name
+    }
+  }
 }
 </script>
-<style lang="">
-  
+<style lang="scss">
+  .highlight {
+    color: #f08d49;
+  }
 </style>
