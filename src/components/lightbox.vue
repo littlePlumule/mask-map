@@ -50,43 +50,35 @@
 </template>
 
 <script>
+import { inject, computed, toRefs } from 'vue';
+
 export default {
   name: 'Lightbox',
-  computed: {
-    showModal: {
-      get() {
-        return this.$store.state.showModal;
-      },
-      set(value) {
-        this.$store.commit('setshowModal', value);
-      },
-    },
-    infoBoxSid: {
-      get() {
-        return this.$store.state.infoBoxSid;
-      },
-      set(value) {
-        this.$store.commit('setInfoBoxSid', value);
-      }
-    },
-    currStore() {
-      return this.$store.state.stores.filter(d => d.id === this.infoBoxSid)[0];
-    },
-    servicePeriods() {
-      let servicePeriods = this?.currStore?.['service_periods'] || '';
+  setup() {
+    const mapStore = inject('mapStore');
+    const { state, setShowModal } = mapStore;
+
+    const currStore = computed(() => state.stores.filter(d => d.id === state.infoBoxSid)[0]);
+    const servicePeriods = computed(() => {
+      let servicePeriods = currStore.value?.['service_periods'] || '';
       servicePeriods = servicePeriods.replace(/N/g, 'O').replace(/Y/g, 'X');
       return servicePeriods
         ? [servicePeriods.slice(0, 7).split(''),
            servicePeriods.slice(7, 14).split(''),
            servicePeriods.slice(14, 21).split('')]
         : servicePeriods;
+    });
+    const close = () => {
+        setShowModal(false);
     }
-  },
-  methods: {
-    close() {
-      this.showModal = false;
-    },
-  },
+
+    return {
+      ...toRefs(state),
+      currStore,
+      servicePeriods,
+      close
+    }
+  }
 };
 </script>
 

@@ -1,16 +1,16 @@
 <template>
 <div id="app">
-  <!-- aside-menu 左側欄 -->
-  <asideMenu @triggerMarkerPopup="openPopup" ref="menu" />
-
-  <!-- 地圖區塊 -->
-  <maskMap ref="map" />
+  <asideMenu />
+  <maskMap />
   <lightBox />
 </div>
 </template>
 
 <script>
-import { mapActions } from 'vuex';
+import { provide } from 'vue';
+import map from './utils/map';
+import mapStore from './store/index';
+
 import asideMenu from './components/asideMenu.vue';
 import lightBox from './components/lightbox';
 import maskMap from './components/maskMap.vue';
@@ -22,15 +22,11 @@ export default {
     lightBox,
     maskMap
   },
-  methods: {
-    ...mapActions(['fetchLoactions', 'fetchPharmacies']),
-    openPopup(id) {
-      this.$refs.map.triggerPopup(id);
-    }
-  },
-  mounted() {
-    this.fetchLoactions();
-    this.fetchPharmacies();
+  setup() {
+    provide('mapStore', mapStore);
+    provide('map', map);
+    mapStore.fetchLoactions();
+    mapStore.fetchPharmacies();
   }
 }
 </script>

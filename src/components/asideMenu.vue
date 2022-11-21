@@ -25,7 +25,7 @@
         class="store-info wraps" 
         v-for="store in filteredStores" 
         :key="store.id"
-        @click="$emit('triggerMarkerPopup', store.id)">
+        @click="triggerPopup(store.id)">
         <h1 v-html="keywordHighlight(store.name)"></h1>
 
         <div class="mask-info">
@@ -52,67 +52,75 @@
   </div>
 </template>
 <script>
-import { mapGetters } from 'vuex';
+import { toRefs, inject, watch, computed } from 'vue';
 export default {  
-  computed: {
-    currCity: {
+  name: 'asideMenu',
+  setup() {
+    const mapStore = inject('mapStore');
+    const map = inject('map');
+    const { triggerPopup } = map;
+    const {
+      state,
+      setcurrCity,
+      setcurrDistrict,
+      setKeywords,
+      setShowModal,
+      setInfoBoxSid 
+    } = mapStore;
+
+    const keywordHighlight = value => {
+      return value.replace(new RegExp(state.keywords, 'g'), `<span class="highlight">${state.keywords}</span>`)
+    };
+
+    const openInfoBox = sid => {
+      setShowModal(true);
+      setInfoBoxSid(sid);
+    };
+
+    const currCity = computed({
       get() {
-        return this.$store.state.currCity;
+        return state.currCity;
       },
       set(value) {
-        this.$store.commit('setcurrCity', value);
+        setcurrCity(value);
       }
-    },
-    currDistrict: {
+    });
+
+    const currDistrict = computed({
       get() {
-        return this.$store.state.currDistrict;
+        return state.currDistrict;
       },
       set(value) {
-        this.$store.commit('setcurrDistrict', value);
-      }
-    },
-    keywords: {
+        setcurrDistrict(value);
+      } 
+    });
+
+    const keywords = computed({
       get() {
-        return this.$store.state.keywords;
+        return state.keywords
       },
       set(value) {
-        this.$store.commit('setKeywords', value);
+        setKeywords(value);
       }
-    },
-    showModal: {
-      get() {
-        return this.$store.state.showModal;
-      },
-      set(value) {
-        this.$store.commit('setshowModal', value);
-      }
-    },
-    infoBoxSid: {
-      get() {
-        return this.$store.state.infoBoxSid;
-      },
-      set(value) {
-        this.$store.commit('setInfoBoxSid', value);
-      }
-    },
-    ...mapGetters(['cityList', 'districtList', 'filteredStores'])
-  },
-  methods: {
-    keywordHighlight(value) {
-      return value.replace(new RegExp(this.keywords, 'g'), `<span class="highlight">${this.keywords}</span>`)
-    },
-    openInfoBox(sid) {
-      this.showModal = true;
-      this.infoBoxSid = sid;
-    }
-  },
-  watch: {
-    districtList(v) {
+    })
+
+    // 注意 ! 物件資料需要透過函式回傳
+    watch(()=>(state.districtList), v => {
       const [arr] = v;
-      this.currDistrict = arr.name
-    }
-  }
-}
+      setcurrDistrict(arr.name)
+    });
+
+    return {
+      ...toRefs(state),
+      currCity,
+      currDistrict,
+      keywords,
+      triggerPopup,
+      openInfoBox,
+      keywordHighlight
+    };
+  },
+};
 </script>
 <style lang="scss">
   .highlight {
