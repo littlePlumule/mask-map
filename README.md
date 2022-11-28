@@ -1,5 +1,7 @@
 # mask-map
 
+## [Demo](https://littleplumule.github.io/mask-map-demo/)
+
 ## 安裝套件
 ```
 npm install
@@ -14,5 +16,3 @@ npm run serve
 ```
 npm run build
 ```
-
-## [Demo](https://littleplumule.github.io/mask-map-demo/)
