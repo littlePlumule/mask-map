@@ -1,19 +1,18 @@
 # mask-map
 
-## Project setup
+## 安裝套件
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### 本地端跑專案
 ```
 npm run serve
 ```
 
-### Compiles and minifies for production
+### 打包
 ```
 npm run build
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## [Demo](https://littleplumule.github.io/mask-map-demo/)
